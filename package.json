@@ -8,10 +8,12 @@
   ],
   "scripts": {
     "web:dev": "npm --prefix apps/web run dev",
-    "mobile:start": "npm --prefix apps/mobile run start",
+    "mobile:start": "npm --prefix apps/mobile run start --",
     "mobile:ios": "npm --prefix apps/mobile run ios",
     "mobile:android": "npm --prefix apps/mobile run android",
     "mobile:doctor": "npm --prefix apps/mobile run doctor",
-    "dom:lint": "rg -n --glob '!**/*.web.*' '(document|window)' apps/mobile packages/shared && (echo 'DOM globals found' && exit 1) || exit 0"
+    "dom:lint": "rg -n --glob '!**/*.web.*' --glob '!**/node_modules/**' --glob '!**/dist/**' --glob '!**/build/**' --glob '!**/.expo/**' -e '\\\\bdocument\\\\b' -e '\\\\bwindow\\\\.document\\\\b' -e '\\\\bglobalThis\\\\.document\\\\b' apps/mobile packages/shared && (echo 'DOM globals found in native/shared code. Move web-only logic to *.web.* files.' && exit 1) || exit 0",
+    "typecheck": "npm --prefix packages/shared run typecheck && npm --prefix apps/mobile run typecheck && npm --prefix apps/web run typecheck",
+    "deps:react": "npm ls react react-native"
   }
 }

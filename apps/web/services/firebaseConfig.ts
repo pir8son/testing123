@@ -6,16 +6,26 @@ import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
-// Verified Production Credentials
 const firebaseConfig = {
-  apiKey: "AIzaSyCzBkYhBVL8KDT-CUyc6eqHFpz9AHIsI1k",
-  authDomain: "gen-lang-client-0320751781.firebaseapp.com",
-  projectId: "gen-lang-client-0320751781",
-  storageBucket: "gen-lang-client-0320751781.firebasestorage.app",
-  messagingSenderId: "284184285704",
-  appId: "1:284184285704:web:697ea4b8b5df66bdc477bd",
-  measurementId: "G-3R75G2M1L0"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY ?? "",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? "",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID ?? "",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? "",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? "",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID ?? "",
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID ?? ""
 };
+
+const missingKeys = Object.entries(firebaseConfig)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingKeys.length > 0) {
+  throw new Error(
+    `Missing Firebase config values: ${missingKeys.join(", ")}. ` +
+      "Copy apps/web/.env.example to apps/web/.env.local and fill in your Firebase settings."
+  );
+}
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
