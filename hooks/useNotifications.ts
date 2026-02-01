@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { db } from '../services/firebaseConfig';
+import { db } from '../config/firebase';
 // @ts-ignore
 import { collection, query, orderBy, limit, onSnapshot, where, doc, writeBatch } from 'firebase/firestore';
 import { AppNotification } from '../types';

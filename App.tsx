@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { Platform, Pressable, Text, View } from 'react-native';
 import BottomNavBar from './components/BottomNavBar';
 import AIScreen from './components/AIScreen';
 import FeedScreen from './components/FeedScreen';
@@ -62,14 +65,29 @@ import UserListScreen from './components/UserListScreen';
 import EditRecipeScreen from './components/EditRecipeScreen'; 
 // @ts-ignore
 import { doc, onSnapshot } from 'firebase/firestore';
-import { db } from './services/firebaseConfig';
+import { db } from './config/firebase';
 import { useSavedRecipes, usePantry, useShoppingList } from './hooks/useUserData';
 import { shoppingListService } from './services/shoppingListService';
 
 export type Tab = 'Feed' | 'Search' | 'AI' | 'You';
 type ProfileStatus = 'IDLE' | 'LOADING' | 'SUCCESS' | 'ERROR';
 
+if (typeof globalThis.document === 'undefined') {
+  (globalThis as typeof globalThis & { document?: { createElement: () => null } }).document = {
+    createElement: () => null,
+  };
+}
+if (typeof globalThis.window === 'undefined') {
+  (globalThis as typeof globalThis & { window?: typeof globalThis }).window = globalThis;
+}
+
 const App: React.FC = () => {
+  const renderWithProviders = (content: React.ReactNode) => (
+    <SafeAreaProvider>
+      <NavigationContainer>{content}</NavigationContainer>
+    </SafeAreaProvider>
+  );
+
   // --- AUTH & DATA GATE STATE ---
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -347,46 +365,48 @@ const App: React.FC = () => {
   // --- RENDERING GATES ---
 
   if (!isLoggedIn) {
-      return (
-        <div className={`${settings.theme} w-full h-full`}>
-            <div className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
-                <div className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out">
-                    <LoginScreen onLoginSuccess={handleLoginSuccess} />
-                </div>
-            </div>
-        </div>
+      return renderWithProviders(
+        <View className={`${settings.theme} w-full h-full`}>
+          <View className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
+            <View className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out">
+              <LoginScreen onLoginSuccess={handleLoginSuccess} />
+            </View>
+          </View>
+        </View>
       );
   }
 
   if (profileStatus === 'LOADING') {
-      return (
-        <div className={`${settings.theme} w-full h-full`}>
-            <div className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
-                <div className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out items-center justify-center">
-                    <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p className="font-bold">Syncing Profile...</p>
-                </div>
-            </div>
-        </div>
+      return renderWithProviders(
+        <View className={`${settings.theme} w-full h-full`}>
+          <View className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
+            <View className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out items-center justify-center">
+              <View className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin mb-4"></View>
+              <Text className="font-bold">Syncing Profile...</Text>
+            </View>
+          </View>
+        </View>
       );
   }
 
   if (profileStatus === 'ERROR' && !userProfile && userId) {
-      return (
-          <div className={`${settings.theme} w-full h-full`}>
-            <div className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
-                <div className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out">
-                     <OnboardingScreen userId={userId} onComplete={handleOnboardingComplete} />
-                </div>
-            </div>
-        </div>
+      return renderWithProviders(
+        <View className={`${settings.theme} w-full h-full`}>
+          <View className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
+            <View className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out">
+              <OnboardingScreen userId={userId} onComplete={handleOnboardingComplete} />
+            </View>
+          </View>
+        </View>
       );
   }
 
-  if (settings.theme === 'dark') {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
+  if (Platform.OS === 'web' && typeof document !== 'undefined') {
+    if (settings.theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
   }
 
   // --- HANDLERS ---
@@ -647,101 +667,266 @@ const App: React.FC = () => {
     }
   }
 
-  return (
-    <>
-    <style>{`
-      html, body, #root { height: 100%; margin: 0; padding: 0; overflow: hidden; }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-    `}</style>
-    <div className={`${settings.theme} w-full h-full`}>
-      <div className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
-        <div className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out">
-          <main className="flex-grow overflow-hidden h-full relative w-full">{renderContent()}</main>
-          
-          {activeSubScreen === null && !showNutritionTracker && !showSavedRecipesScreen && !activeUserList && !editingRecipe && !viewingProfileId && (<BottomNavBar activeTab={activeTab} setActiveTab={handleTabSwitch} />)}
-          
+  return renderWithProviders(
+    <View className={`${settings.theme} w-full h-full`}>
+      <View className="flex justify-center items-center h-full w-full font-sans bg-gray-100 dark:bg-gray-900 sm:p-4 md:p-8">
+        <View className="w-full h-full sm:max-w-[400px] sm:h-[850px] sm:max-h-[100%] bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 sm:shadow-2xl sm:rounded-[40px] overflow-hidden flex flex-col relative transition-all duration-300 ease-in-out">
+          <View className="flex-grow overflow-hidden h-full relative w-full">{renderContent()}</View>
+
+          {activeSubScreen === null && !showNutritionTracker && !showSavedRecipesScreen && !activeUserList && !editingRecipe && !viewingProfileId && (
+            <BottomNavBar activeTab={activeTab} setActiveTab={handleTabSwitch} />
+          )}
+
           {renderSubScreen()}
-          {selectedRecipe && (<RecipeBottomSheet recipe={selectedRecipe} onClose={() => setSelectedRecipe(null)} isSaved={selectedRecipe.id ? realtimeSavedIds.has(selectedRecipe.id) : false} onToggleSave={() => toggleSaveRecipe(selectedRecipe.id)} isRecipeInShoppingList={false} toggleRecipeInShoppingList={() => toggleRecipeInShoppingList(selectedRecipe.id)} onSendToSmartHome={() => {}} onScale={() => setShowScalePopup(true)} onSubstitute={() => setShowSubstitutePopup(true)} onMakeHealthier={() => setShowHealthierPopup(true)} />)}
-          {commentingOnRecipe && (<CommentSheet recipe={commentingOnRecipe} onClose={() => setCommentingOnRecipe(null)} currentUser={userProfile} onViewProfile={setViewingProfileId} />)}
-          {isAiChatActive && userProfile && (<div className="absolute inset-0 z-40 bg-white dark:bg-gray-950"><ChatScreen onBack={() => setIsAiChatActive(false)} pantryItems={realtimePantryItems} nutritionLog={nutritionLog} mealPlan={mealPlan} savedRecipes={realtimeSavedRecipes} userSettings={settings} /></div>)}
-          {showSettings && (<SettingsScreen onClose={() => setShowSettings(false)} settings={settings} onUpdateSettings={handleUpdateSettings} onOpenCreatorSettings={() => setShowCreatorSettings(true)} />)}
-          {showCookWhatYouHave && (<RecipeSuggestionsScreen onClose={() => setShowCookWhatYouHave(false)} isLoading={isFetchingSuggestions} suggestions={suggestedRecipes} />)}
-          {showMealPlanner && (<MealPlannerScreen onClose={() => setShowMealPlanner(false)} onGenerate={handleGenerateMealPlan} isLoading={isFetchingMealPlan} mealPlan={mealPlan} onSave={handleSaveMealPlan} savedRecipes={realtimeSavedRecipes} onShowSaved={() => setShowSavedMealPlans(true)} onSelectRecipe={setSelectedRecipe} />)}
-          
-          {/* FIXED: Passed userId={userId!} to the overlay instance */}
-          {showSavedMealPlans && (
-            <SavedMealPlansScreen 
-                userId={userId!}
-                onClose={() => setShowSavedMealPlans(false)} 
-                savedPlans={savedMealPlans} 
-                onAddToShoppingList={handleAddMealPlanToShoppingList} 
-                onSelectRecipe={setSelectedRecipe} 
+          {selectedRecipe && (
+            <RecipeBottomSheet
+              recipe={selectedRecipe}
+              onClose={() => setSelectedRecipe(null)}
+              isSaved={selectedRecipe.id ? realtimeSavedIds.has(selectedRecipe.id) : false}
+              onToggleSave={() => toggleSaveRecipe(selectedRecipe.id)}
+              isRecipeInShoppingList={false}
+              toggleRecipeInShoppingList={() => toggleRecipeInShoppingList(selectedRecipe.id)}
+              onSendToSmartHome={() => {}}
+              onScale={() => setShowScalePopup(true)}
+              onSubstitute={() => setShowSubstitutePopup(true)}
+              onMakeHealthier={() => setShowHealthierPopup(true)}
+            />
+          )}
+          {commentingOnRecipe && (
+            <CommentSheet
+              recipe={commentingOnRecipe}
+              onClose={() => setCommentingOnRecipe(null)}
+              currentUser={userProfile}
+              onViewProfile={setViewingProfileId}
+            />
+          )}
+          {isAiChatActive && userProfile && (
+            <View className="absolute inset-0 z-40 bg-white dark:bg-gray-950">
+              <ChatScreen
+                onBack={() => setIsAiChatActive(false)}
+                pantryItems={realtimePantryItems}
+                nutritionLog={nutritionLog}
+                mealPlan={mealPlan}
+                savedRecipes={realtimeSavedRecipes}
+                userSettings={settings}
+              />
+            </View>
+          )}
+          {showSettings && (
+            <SettingsScreen
+              onClose={() => setShowSettings(false)}
+              settings={settings}
+              onUpdateSettings={handleUpdateSettings}
+              onOpenCreatorSettings={() => setShowCreatorSettings(true)}
+            />
+          )}
+          {showCookWhatYouHave && (
+            <RecipeSuggestionsScreen
+              onClose={() => setShowCookWhatYouHave(false)}
+              isLoading={isFetchingSuggestions}
+              suggestions={suggestedRecipes}
+            />
+          )}
+          {showMealPlanner && (
+            <MealPlannerScreen
+              onClose={() => setShowMealPlanner(false)}
+              onGenerate={handleGenerateMealPlan}
+              isLoading={isFetchingMealPlan}
+              mealPlan={mealPlan}
+              onSave={handleSaveMealPlan}
+              savedRecipes={realtimeSavedRecipes}
+              onShowSaved={() => setShowSavedMealPlans(true)}
+              onSelectRecipe={setSelectedRecipe}
             />
           )}
 
-          {showSmartSuggestions && (<SmartSuggestionsScreen onClose={() => setShowSmartSuggestions(false)} isLoading={isFetchingSmartSuggestions} suggestions={smartSuggestions} />)}
-          {showSmartSwaps && (<SmartSwapsScreen onClose={() => setShowSmartSwaps(false)} getSwaps={getSmartSwaps} />)}
-          {showNutritionTracker && (<NutritionTrackerScreen onClose={() => setShowNutritionTracker(false)} log={nutritionLog} goals={nutritionGoals} onAddFood={() => setShowAddFood(true)} onShowHistory={() => setShowNutritionHistory(true)} onRemoveFood={handleRemoveLoggedFood} onResetLog={handleResetNutritionLog} onEditGoals={() => setShowSetGoals(true)} onShowDetails={setDetailedFoodItem} onScanBarcode={() => handleOpenBarcodeScanner('nutrition')} />)}
-          {showAddFood && (<AddFoodScreen onClose={() => setShowAddFood(false)} onLogFood={handleLogFood} isLoading={isLoggingFood} onScanBarcode={() => handleOpenBarcodeScanner('nutrition')} />)}
-          {showNutritionHistory && (<NutritionHistoryScreen onClose={() => setShowNutritionHistory(false)} log={nutritionLog} goals={nutritionGoals} />)}
-          {showSetGoals && (<SetGoalsScreen onClose={() => setShowSetGoals(false)} currentGoals={nutritionGoals} onSave={handleSetNutritionGoals} />)}
-          {detailedFoodItem && (<FoodDetailPopup foodItem={detailedFoodItem} onClose={() => setDetailedFoodItem(null)} />)}
-          {showUploadScreen && userProfile && (<UploadScreen onClose={() => setShowUploadScreen(false)} onPublish={handleAddNewRecipe} currentUser={userProfile} />)}
-          {showScalePopup && selectedRecipe && (<ScaleRecipePopup recipe={selectedRecipe} onClose={() => setShowScalePopup(false)} getScaledIngredients={scaleRecipeIngredients} />)}
-          {showSubstitutePopup && selectedRecipe && (<SubstituteIngredientPopup recipe={selectedRecipe} onClose={() => setShowSubstitutePopup(false)} getSuggestions={getIngredientSubstitutes} />)}
-          {showHealthierPopup && selectedRecipe && (<MakeHealthierPopup recipe={selectedRecipe} onClose={() => setShowHealthierPopup(false)} getHealthierVersion={makeRecipeHealthier} />)}
-          {suggestionPopup && (<SuggestionPopup type={suggestionPopup.type} onClose={() => setSuggestionPopup(null)} onSubmit={handleSubmitSuggestion} />)}
-          {showGenerationNotice && (<GenerationNoticePopup onClose={() => setShowGenerationNotice(false)} />)}
-          {showAddPantryItem && (<AddPantryItemScreen onClose={() => setShowAddPantryItem(false)} onManualAdd={handleAddPantryItems} onScanImage={handleScanPantryImage} onScanBarcode={() => handleOpenBarcodeScanner('pantry')} />)}
-          {showMarkAsCooked && (<MarkAsCookedScreen onClose={() => setShowMarkAsCooked(false)} pantryItems={realtimePantryItems} recipes={recipeDatabase} onCook={handleCookRecipe} />)}
-          {showPantryScanReview && scannedPantryItems && (<PantryScanReviewScreen onClose={() => setShowPantryScanReview(false)} scanResult={scannedPantryItems} onConfirm={handleConfirmPantryScan} />)}
-          {showPantryScanningPopup && (<PantryScanningPopup onClose={() => setShowPantryScanningPopup(false)} />)}
-          {showAddCollectionPopup && (<AddCollectionPopup onClose={() => setShowAddCollectionPopup(false)} onCreate={handleCreateCollection} />)}
-          {recipeToAddToCollection && (<AddToCollectionSheet onClose={() => setRecipeToAddToCollection(null)} recipe={recipeToAddToCollection} collections={userCollections} onAddToCollection={handleAddRecipeToCollection} />)}
-          {showBarcodeScanner && (<BarcodeScanner onClose={() => setShowBarcodeScanner(false)} onScan={handleBarcodeScan} />)}
-          {editingRecipe && userProfile && (<EditRecipeScreen recipe={editingRecipe} onClose={() => setEditingRecipe(null)} onUpdate={handleRecipeUpdateComplete} userId={userProfile.id} />)}
-          {showCreatorSettings && userProfile && (<CreatorSettingsSheet onClose={() => setShowCreatorSettings(false)} userProfile={userProfile} onUpdateProfile={setUserProfile} />)}
-          {activeUserList && userProfile && (<UserListScreen type={activeUserList.type} targetUserId={activeUserList.userId} currentUserId={userProfile.id} onClose={() => setActiveUserList(null)} onViewProfile={(id) => { setActiveUserList(null); setViewingProfileId(id); }} />)}
-          {showNotifications && userProfile && (<NotificationCenter userId={userProfile.id} onClose={() => setShowNotifications(false)} onViewRecipe={handleViewRecipeFromNotification} onViewProfile={setViewingProfileId} />)}
-          
+          {/* FIXED: Passed userId={userId!} to the overlay instance */}
+          {showSavedMealPlans && (
+            <SavedMealPlansScreen
+              userId={userId!}
+              onClose={() => setShowSavedMealPlans(false)}
+              savedPlans={savedMealPlans}
+              onAddToShoppingList={handleAddMealPlanToShoppingList}
+              onSelectRecipe={setSelectedRecipe}
+            />
+          )}
+
+          {showSmartSuggestions && (
+            <SmartSuggestionsScreen
+              onClose={() => setShowSmartSuggestions(false)}
+              isLoading={isFetchingSmartSuggestions}
+              suggestions={smartSuggestions}
+            />
+          )}
+          {showSmartSwaps && <SmartSwapsScreen onClose={() => setShowSmartSwaps(false)} getSwaps={getSmartSwaps} />}
+          {showNutritionTracker && (
+            <NutritionTrackerScreen
+              onClose={() => setShowNutritionTracker(false)}
+              log={nutritionLog}
+              goals={nutritionGoals}
+              onAddFood={() => setShowAddFood(true)}
+              onShowHistory={() => setShowNutritionHistory(true)}
+              onRemoveFood={handleRemoveLoggedFood}
+              onResetLog={handleResetNutritionLog}
+              onEditGoals={() => setShowSetGoals(true)}
+              onShowDetails={setDetailedFoodItem}
+              onScanBarcode={() => handleOpenBarcodeScanner('nutrition')}
+            />
+          )}
+          {showAddFood && (
+            <AddFoodScreen
+              onClose={() => setShowAddFood(false)}
+              onLogFood={handleLogFood}
+              isLoading={isLoggingFood}
+              onScanBarcode={() => handleOpenBarcodeScanner('nutrition')}
+            />
+          )}
+          {showNutritionHistory && (
+            <NutritionHistoryScreen onClose={() => setShowNutritionHistory(false)} log={nutritionLog} goals={nutritionGoals} />
+          )}
+          {showSetGoals && (
+            <SetGoalsScreen onClose={() => setShowSetGoals(false)} currentGoals={nutritionGoals} onSave={handleSetNutritionGoals} />
+          )}
+          {detailedFoodItem && <FoodDetailPopup foodItem={detailedFoodItem} onClose={() => setDetailedFoodItem(null)} />}
+          {showUploadScreen && userProfile && (
+            <UploadScreen onClose={() => setShowUploadScreen(false)} onPublish={handleAddNewRecipe} currentUser={userProfile} />
+          )}
+          {showScalePopup && selectedRecipe && (
+            <ScaleRecipePopup recipe={selectedRecipe} onClose={() => setShowScalePopup(false)} getScaledIngredients={scaleRecipeIngredients} />
+          )}
+          {showSubstitutePopup && selectedRecipe && (
+            <SubstituteIngredientPopup
+              recipe={selectedRecipe}
+              onClose={() => setShowSubstitutePopup(false)}
+              getSuggestions={getIngredientSubstitutes}
+            />
+          )}
+          {showHealthierPopup && selectedRecipe && (
+            <MakeHealthierPopup
+              recipe={selectedRecipe}
+              onClose={() => setShowHealthierPopup(false)}
+              getHealthierVersion={makeRecipeHealthier}
+            />
+          )}
+          {suggestionPopup && (
+            <SuggestionPopup type={suggestionPopup.type} onClose={() => setSuggestionPopup(null)} onSubmit={handleSubmitSuggestion} />
+          )}
+          {showGenerationNotice && <GenerationNoticePopup onClose={() => setShowGenerationNotice(false)} />}
+          {showAddPantryItem && (
+            <AddPantryItemScreen
+              onClose={() => setShowAddPantryItem(false)}
+              onManualAdd={handleAddPantryItems}
+              onScanImage={handleScanPantryImage}
+              onScanBarcode={() => handleOpenBarcodeScanner('pantry')}
+            />
+          )}
+          {showMarkAsCooked && (
+            <MarkAsCookedScreen
+              onClose={() => setShowMarkAsCooked(false)}
+              pantryItems={realtimePantryItems}
+              recipes={recipeDatabase}
+              onCook={handleCookRecipe}
+            />
+          )}
+          {showPantryScanReview && scannedPantryItems && (
+            <PantryScanReviewScreen
+              onClose={() => setShowPantryScanReview(false)}
+              scanResult={scannedPantryItems}
+              onConfirm={handleConfirmPantryScan}
+            />
+          )}
+          {showPantryScanningPopup && <PantryScanningPopup onClose={() => setShowPantryScanningPopup(false)} />}
+          {showAddCollectionPopup && <AddCollectionPopup onClose={() => setShowAddCollectionPopup(false)} onCreate={handleCreateCollection} />}
+          {recipeToAddToCollection && (
+            <AddToCollectionSheet
+              onClose={() => setRecipeToAddToCollection(null)}
+              recipe={recipeToAddToCollection}
+              collections={userCollections}
+              onAddToCollection={handleAddRecipeToCollection}
+            />
+          )}
+          {showBarcodeScanner && <BarcodeScanner onClose={() => setShowBarcodeScanner(false)} onScan={handleBarcodeScan} />}
+          {editingRecipe && userProfile && (
+            <EditRecipeScreen
+              recipe={editingRecipe}
+              onClose={() => setEditingRecipe(null)}
+              onUpdate={handleRecipeUpdateComplete}
+              userId={userProfile.id}
+            />
+          )}
+          {showCreatorSettings && userProfile && (
+            <CreatorSettingsSheet
+              onClose={() => setShowCreatorSettings(false)}
+              userProfile={userProfile}
+              onUpdateProfile={setUserProfile}
+            />
+          )}
+          {activeUserList && userProfile && (
+            <UserListScreen
+              type={activeUserList.type}
+              targetUserId={activeUserList.userId}
+              currentUserId={userProfile.id}
+              onClose={() => setActiveUserList(null)}
+              onViewProfile={(id) => {
+                setActiveUserList(null);
+                setViewingProfileId(id);
+              }}
+            />
+          )}
+          {showNotifications && userProfile && (
+            <NotificationCenter
+              userId={userProfile.id}
+              onClose={() => setShowNotifications(false)}
+              onViewRecipe={handleViewRecipeFromNotification}
+              onViewProfile={setViewingProfileId}
+            />
+          )}
+
           {/* Global Restore Dialog */}
           {planToRestore && userProfile && (
-              <div className="absolute inset-0 bg-black/40 z-[100] flex items-end sm:items-center justify-center" onClick={() => setPlanToRestore(null)}>
-                  <div className="w-full sm:max-w-sm bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-2xl p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
-                    <div className="w-12 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full mx-auto mb-6 sm:hidden"></div>
-                    <h3 className="text-xl font-extrabold text-gray-900 dark:text-white mb-2">Use "{planToRestore.title}"?</h3>
-                    <p className="text-sm text-gray-500 mb-6">Choose how to add these {planToRestore.itemCount} items to your shopping list.</p>
-                    <div className="space-y-3">
-                        <button 
-                            onClick={async () => {
-                                await shoppingListService.restoreListToActive(userProfile.id, planToRestore.items, 'merge');
-                                setPlanToRestore(null);
-                                setActiveSubScreen('shoppingList');
-                            }}
-                            className="w-full py-4 bg-green-600 text-white font-bold rounded-2xl shadow-lg hover:bg-green-700 transition-all"
-                        >
-                            Add to current list
-                        </button>
-                        <button 
-                            onClick={async () => {
-                                await shoppingListService.restoreListToActive(userProfile.id, planToRestore.items, 'overwrite');
-                                setPlanToRestore(null);
-                                setActiveSubScreen('shoppingList');
-                            }}
-                            className="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-2xl hover:bg-gray-200 transition-all"
-                        >
-                            Replace current list
-                        </button>
-                        <button onClick={() => setPlanToRestore(null)} className="w-full py-4 text-gray-400 font-bold text-sm">Cancel</button>
-                    </div>
-                </div>
-              </div>
+            <Pressable
+              className="absolute inset-0 bg-black/40 z-[100] flex items-end sm:items-center justify-center"
+              onPress={() => setPlanToRestore(null)}
+            >
+              <Pressable className="w-full sm:max-w-sm bg-white dark:bg-gray-900 rounded-t-3xl sm:rounded-2xl p-6 animate-slide-up">
+                <View className="w-12 h-1.5 bg-gray-200 dark:bg-gray-800 rounded-full mx-auto mb-6 sm:hidden"></View>
+                <Text className="text-xl font-extrabold text-gray-900 dark:text-white mb-2">
+                  Use "{planToRestore.title}"?
+                </Text>
+                <Text className="text-sm text-gray-500 mb-6">
+                  Choose how to add these {planToRestore.itemCount} items to your shopping list.
+                </Text>
+                <View className="space-y-3">
+                  <Pressable
+                    onPress={async () => {
+                      await shoppingListService.restoreListToActive(userProfile.id, planToRestore.items, 'merge');
+                      setPlanToRestore(null);
+                      setActiveSubScreen('shoppingList');
+                    }}
+                    className="w-full py-4 bg-green-600 text-white font-bold rounded-2xl shadow-lg hover:bg-green-700 transition-all"
+                  >
+                    <Text className="text-center text-white font-bold">Add to current list</Text>
+                  </Pressable>
+                  <Pressable
+                    onPress={async () => {
+                      await shoppingListService.restoreListToActive(userProfile.id, planToRestore.items, 'overwrite');
+                      setPlanToRestore(null);
+                      setActiveSubScreen('shoppingList');
+                    }}
+                    className="w-full py-4 bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-white font-bold rounded-2xl hover:bg-gray-200 transition-all"
+                  >
+                    <Text className="text-center font-bold text-gray-800 dark:text-white">Replace current list</Text>
+                  </Pressable>
+                  <Pressable onPress={() => setPlanToRestore(null)} className="w-full py-4 text-gray-400 font-bold text-sm">
+                    <Text className="text-center text-gray-400 font-bold text-sm">Cancel</Text>
+                  </Pressable>
+                </View>
+              </Pressable>
+            </Pressable>
           )}
-        </div>
-      </div>
-    </div>
-    </>
+        </View>
+      </View>
+    </View>
   );
 };
 

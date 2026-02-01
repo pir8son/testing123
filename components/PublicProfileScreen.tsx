@@ -6,7 +6,7 @@ import RecipeCard from './RecipeCard';
 import { ShareIcon } from './icons/ShareIcon';
 import { recipeService } from '../services/recipeService';
 import { useFollow } from '../hooks/useSocial'; 
-import { db } from '../services/firebaseConfig';
+import { db } from '../config/firebase';
 import { shareService } from '../services/shareService';
 import { shoppingListService } from '../services/shoppingListService';
 // @ts-ignore

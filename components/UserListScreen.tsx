@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { UserProfile } from '../types';
 import { ArrowLeftIcon } from './icons/ArrowLeftIcon';
 import { interactionService } from '../services/interactionService';
-import { db } from '../services/firebaseConfig';
+import { db } from '../config/firebase';
 // @ts-ignore
 import { doc, getDoc } from 'firebase/firestore';
 

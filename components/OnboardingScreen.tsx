@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { UserProfile } from '../types';
 import { storageService } from '../services/storageService';
-import { db } from '../services/firebaseConfig';
+import { db } from '../config/firebase';
 // @ts-ignore
 import { doc, setDoc } from 'firebase/firestore';
 import { CameraIcon } from './icons/CameraIcon';
