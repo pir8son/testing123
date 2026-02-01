@@ -1,0 +1,16 @@
+{
+  "expo": {
+    "name": "Swipe to Recipe",
+    "slug": "swipe-to-recipe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "jsEngine": "hermes",
+    "ios": {
+      "bundleIdentifier": "com.swipetorecipe.mobile"
+    },
+    "android": {
+      "package": "com.swipetorecipe.mobile"
+    },
+    "platforms": ["ios", "android", "web"]
+  }
+}

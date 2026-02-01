@@ -1,20 +1,47 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Swipe to Recipe (Monorepo)
 
-# Run and deploy your AI Studio app
+This repository now contains separate apps for web and mobile, with a shared workspace for cross-platform utilities.
 
-This contains everything you need to run your app locally.
+## Structure
 
-View your app in AI Studio: https://ai.studio/apps/drive/1lP6X5aCn0icIHv-cm6EnBj9b0N8WPmjn
+```
+/apps
+  /mobile   # Expo managed app (iOS/Android, Hermes)
+  /web      # Existing Vite web app
+/packages
+  /shared   # Shared utilities/types for native/web
+```
 
-## Run Locally
+## Prerequisites
 
-**Prerequisites:**  Node.js
+- Node.js
+- For iOS/Android: Xcode/Android Studio (or Expo Go/dev client)
 
+## Web app
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+```bash
+npm install
+npm run web:dev
+```
+
+## Mobile app (Expo)
+
+```bash
+npm install
+npm run mobile:start
+```
+
+Run platform builds:
+
+```bash
+npm run mobile:ios
+npm run mobile:android
+```
+
+## DOM safety check
+
+```bash
+npm run dom:lint
+```
+
+This command scans the native/shared workspaces to ensure no DOM globals are referenced outside the web app.
