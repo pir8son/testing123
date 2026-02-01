@@ -4,7 +4,6 @@ import { initializeApp } from "firebase/app";
 import { getFirestore, initializeFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import { getAnalytics } from "firebase/analytics";
 
 // Verified Production Credentials
 const firebaseConfig = {
@@ -32,15 +31,7 @@ const auth = getAuth(app);
 // Initialize Storage
 const storage = getStorage(app);
 
-// Initialize Analytics (Safe check)
-let analytics;
-try {
-    analytics = getAnalytics(app);
-} catch (e) {
-    console.warn("Analytics failed to initialize (likely environment restriction):", e);
-}
-
 console.log("🔥 Firebase Config Loaded for Project:", firebaseConfig.projectId);
 console.log("🗄️ Connected to Named Database: sizzledatabasetest1");
 
-export { app, db, auth, storage, analytics };
+export { app, db, auth, storage };
