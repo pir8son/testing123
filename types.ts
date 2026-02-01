@@ -2,6 +2,7 @@
 // --- DOMAIN MODELS ---
 
 export type MessageSender = 'user' | 'bot';
+export type Tab = 'Feed' | 'Search' | 'AI' | 'You';
 
 export interface ChatMessage {
   id: string;

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Tab } from '../App';
+import { Tab } from '../types';
 import { HomeIcon } from './icons/HomeIcon';
 import { SearchIcon } from './icons/SearchIcon';
 import { SparklesIcon } from './icons/SparklesIcon';

@@ -1,10 +1,13 @@
 
 // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { getFirestore, initializeFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getApps, initializeApp } from "firebase/app";
+import { initializeFirestore } from "firebase/firestore";
+import { getAuth, initializeAuth } from "firebase/auth";
+import { getReactNativePersistence } from "firebase/auth/react-native";
 import { getStorage } from "firebase/storage";
-import { getAnalytics } from "firebase/analytics";
+import { getAnalytics, type Analytics } from "firebase/analytics";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
 // Verified Production Credentials
 const firebaseConfig = {
@@ -18,7 +21,7 @@ const firebaseConfig = {
 };
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 
 // Initialize Firestore targeting the specific Named Database "sizzledatabasetest1"
 // We use initializeFirestore to ensure settings (like polling) are applied to this specific instance.
@@ -27,17 +30,29 @@ const db = initializeFirestore(app, {
 }, "sizzledatabasetest1");
 
 // Initialize Auth
-const auth = getAuth(app);
+const auth =
+  Platform.OS === "web"
+    ? getAuth(app)
+    : (() => {
+        try {
+          return initializeAuth(app, {
+            persistence: getReactNativePersistence(AsyncStorage),
+          });
+        } catch (error) {
+          console.warn("Auth already initialized, falling back to getAuth.", error);
+          return getAuth(app);
+        }
+      })();
 
 // Initialize Storage
 const storage = getStorage(app);
 
 // Initialize Analytics (Safe check)
-let analytics;
-try {
-    analytics = getAnalytics(app);
-} catch (e) {
-    console.warn("Analytics failed to initialize (likely environment restriction):", e);
+let analytics: Analytics | undefined;
+if (Platform.OS === "web") {
+  analytics = getAnalytics(app);
+} else {
+  console.log("Firebase initialized (Native Mode)");
 }
 
 console.log("🔥 Firebase Config Loaded for Project:", firebaseConfig.projectId);
