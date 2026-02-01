@@ -1,4 +1,4 @@
-
+// @web-only
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Recipe, UserProfile } from '../types';
 import { recipeService } from '../services/recipeService';

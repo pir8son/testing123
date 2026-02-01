@@ -1,5 +1,6 @@
 
 import { storage } from './firebaseConfig';
+import { isWeb, warnIfNotWeb } from '../utils/platform';
 // @ts-ignore
 import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
 
@@ -20,6 +21,11 @@ export const mediaService = {
    * Specs: Max 1080px width, 0.8 JPEG quality.
    */
   compressImage: async (fileOrBlob: File | Blob): Promise<Blob> => {
+    if (!isWeb) {
+      warnIfNotWeb('Image compression');
+      throw new Error('Image compression requires a web-capable runtime.');
+    }
+
     return new Promise((resolve, reject) => {
       const img = new Image();
       const objectUrl = URL.createObjectURL(fileOrBlob);
@@ -79,6 +85,11 @@ export const mediaService = {
    * @param timeInMs The specific timestamp to capture (default 1000ms).
    */
   generateThumbnail: async (videoFile: File, timeInMs: number = 1000): Promise<Blob> => {
+    if (!isWeb) {
+      warnIfNotWeb('Video thumbnail generation');
+      throw new Error('Video thumbnail generation requires a web-capable runtime.');
+    }
+
     console.log(`[MediaService] Generating thumbnail at ${timeInMs}ms`);
     
     return new Promise((resolve, reject) => {

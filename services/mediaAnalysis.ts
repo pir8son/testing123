@@ -1,12 +1,18 @@
 
 import { parseRecipeFromImage } from './geminiService';
 import { Recipe } from '../types';
+import { isWeb, warnIfNotWeb } from '../utils/platform';
 
 /**
  * Extracts a high-quality frame from a video file locally in the browser.
  * This avoids uploading the entire video for analysis.
  */
 export const extractFrameFromVideo = (videoFile: File): Promise<string> => {
+  if (!isWeb) {
+    warnIfNotWeb('Video frame extraction');
+    return Promise.reject(new Error('Video frame extraction requires a web-capable runtime.'));
+  }
+
   return new Promise((resolve, reject) => {
     const video = document.createElement('video');
     video.preload = 'metadata';
@@ -77,6 +83,11 @@ export const extractFrameFromVideo = (videoFile: File): Promise<string> => {
 };
 
 const fileToBase64 = (file: File): Promise<string> => {
+    if (!isWeb) {
+        warnIfNotWeb('Image base64 conversion');
+        return Promise.reject(new Error('Image conversion requires a web-capable runtime.'));
+    }
+
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -96,6 +107,11 @@ export const mediaAnalysisService = {
      * If image: sends image to AI.
      */
     analyzeMedia: async (file: File): Promise<Partial<Recipe>> => {
+        if (!isWeb) {
+            warnIfNotWeb('Media analysis');
+            throw new Error('Media analysis requires a web-capable runtime.');
+        }
+
         const isVideo = file.type.startsWith('video/');
         let imageBase64 = '';
 

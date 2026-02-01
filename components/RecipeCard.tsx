@@ -8,6 +8,7 @@ import { EditIcon } from './icons/EditIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { PlayIcon } from './icons/PlayIcon';
 import { XIcon } from './icons/XIcon';
+import { confirmAction } from '../utils/confirm';
 
 interface RecipeCardProps {
   recipe: Recipe;
@@ -39,7 +40,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick, onEdit, onDele
       setShowActionSheet(false);
       if (onDelete) {
           // Double Confirmation
-          if (window.confirm(`Delete "${recipe.title}"?\nThis action cannot be undone.`)) {
+          if (confirmAction(`Delete "${recipe.title}"?\nThis action cannot be undone.`)) {
               onDelete(recipe.id);
           }
       }

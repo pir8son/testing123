@@ -65,6 +65,7 @@ import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from './services/firebaseConfig';
 import { useSavedRecipes, usePantry, useShoppingList } from './hooks/useUserData';
 import { shoppingListService } from './services/shoppingListService';
+import { isWeb } from './utils/platform';
 
 export type Tab = 'Feed' | 'Search' | 'AI' | 'You';
 type ProfileStatus = 'IDLE' | 'LOADING' | 'SUCCESS' | 'ERROR';
@@ -197,6 +198,16 @@ const App: React.FC = () => {
       }
       loadData();
   }, [contentVersion]); 
+
+  useEffect(() => {
+    if (!isWeb) return;
+    const root = document.documentElement;
+    if (settings.theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [settings.theme]);
 
   const handleLoginSuccess = (id: string) => {
       setUserId(id);
@@ -381,12 +392,6 @@ const App: React.FC = () => {
             </div>
         </div>
       );
-  }
-
-  if (settings.theme === 'dark') {
-    document.documentElement.classList.add('dark');
-  } else {
-    document.documentElement.classList.remove('dark');
   }
 
   // --- HANDLERS ---

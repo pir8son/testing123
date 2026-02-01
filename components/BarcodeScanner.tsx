@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { XIcon } from './icons/XIcon';
 import { BarcodeIcon } from './icons/BarcodeIcon';
+import { isWeb, warnIfNotWeb } from '../utils/platform';
 
 interface BarcodeScannerProps {
   onClose: () => void;
@@ -24,7 +25,17 @@ const BarcodeScanner: React.FC<BarcodeScannerProps> = ({ onClose, onScan }) => {
     let stream: MediaStream | null = null;
 
     const startCamera = async () => {
+      if (!isWeb) {
+        warnIfNotWeb('Camera access');
+        setHasPermission(false);
+        return;
+      }
+
       try {
+        if (!navigator.mediaDevices?.getUserMedia) {
+          throw new Error('Camera API unavailable');
+        }
+
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
         if (videoRef.current) {
           videoRef.current.srcObject = stream;
