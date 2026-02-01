@@ -3,7 +3,7 @@ import React, { useState, useRef } from 'react';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { ArrowLeftIcon } from './icons/ArrowLeftIcon';
 import { signInAnonymously } from 'firebase/auth';
-import { auth } from '../services/firebaseConfig';
+import { auth } from '../config/firebase';
 
 interface LoginScreenProps {
   onLoginSuccess: (userId: string) => void;

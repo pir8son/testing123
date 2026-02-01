@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 // @ts-ignore -- Resolves TS error claiming exports are missing in firebase/firestore module
 import { doc, writeBatch } from 'firebase/firestore';
-import { db } from '../services/firebaseConfig';
+import { db } from '../config/firebase';
 import { mockFeed } from '../data/mockFeed';
 import { UploadIcon } from './icons/UploadIcon';
 

@@ -7,7 +7,7 @@ import { PlusIcon } from './icons/PlusIcon';
 import { shoppingListService } from '../services/shoppingListService';
 import { TrashIcon } from './icons/TrashIcon';
 import { CheckIcon } from './icons/CheckIcon';
-import { auth } from '../services/firebaseConfig';
+import { auth } from '../config/firebase';
 
 interface PlanBuilderScreenProps {
   onClose: () => void;

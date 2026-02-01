@@ -5,7 +5,7 @@ import { XIcon } from './icons/XIcon';
 import { CameraIcon } from './icons/CameraIcon';
 import { UploadIcon } from './icons/UploadIcon';
 import { storageService } from '../services/storageService';
-import { db } from '../services/firebaseConfig';
+import { db } from '../config/firebase';
 // @ts-ignore
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 

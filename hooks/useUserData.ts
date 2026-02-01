@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { db } from '../services/firebaseConfig';
+import { db } from '../config/firebase';
 // @ts-ignore
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { Recipe, Ingredient } from '../types';
