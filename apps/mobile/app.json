@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Mobile",
+    "slug": "mobile",
+    "sdkVersion": "50.0.0",
+    "platforms": ["ios", "android"],
+    "ios": {
+      "bundleIdentifier": "com.example.mobile"
+    },
+    "android": {
+      "package": "com.example.mobile"
+    }
+  }
+}
