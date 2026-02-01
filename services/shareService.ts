@@ -1,5 +1,6 @@
 
 import { Recipe, UserProfile } from '../types';
+import { isWeb, warnIfNotWeb } from '../utils/platform';
 
 const APP_URL = 'https://swipetorecipe.app';
 
@@ -43,7 +44,12 @@ export const shareService = {
  * Internal helper to handle Native Share vs Clipboard Fallback
  */
 async function shareData(title: string, text: string, url: string) {
-  if (navigator.share) {
+  if (!isWeb) {
+    warnIfNotWeb('Sharing content');
+    return;
+  }
+
+  if (typeof navigator !== 'undefined' && navigator.share) {
     try {
       await navigator.share({
         title,
@@ -56,7 +62,7 @@ async function shareData(title: string, text: string, url: string) {
         console.error('Error sharing:', error);
       }
     }
-  } else {
+  } else if (typeof navigator !== 'undefined' && navigator.clipboard) {
     // Desktop Fallback
     try {
       await navigator.clipboard.writeText(`${text} ${url}`);
@@ -64,5 +70,7 @@ async function shareData(title: string, text: string, url: string) {
     } catch (error) {
       console.error('Failed to copy to clipboard', error);
     }
+  } else {
+    console.warn('Sharing is not supported in this environment.');
   }
 }
