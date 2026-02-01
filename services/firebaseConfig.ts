@@ -1,8 +1,11 @@
 
 // Import the functions you need from the SDKs you need
+import { Platform } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { initializeApp } from "firebase/app";
 import { getFirestore, initializeFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, initializeAuth } from "firebase/auth";
+import { getReactNativePersistence } from "firebase/auth/react-native";
 import { getStorage } from "firebase/storage";
 import { getAnalytics } from "firebase/analytics";
 
@@ -26,18 +29,27 @@ const db = initializeFirestore(app, {
     experimentalForceLongPolling: true,
 }, "sizzledatabasetest1");
 
-// Initialize Auth
-const auth = getAuth(app);
+// Initialize Auth with persistence in React Native
+const auth =
+  Platform.OS === "web"
+    ? getAuth(app)
+    : initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      });
 
 // Initialize Storage
 const storage = getStorage(app);
 
-// Initialize Analytics (Safe check)
+// Initialize Analytics (web-only)
 let analytics;
-try {
+if (Platform.OS === "web") {
+  try {
     analytics = getAnalytics(app);
-} catch (e) {
+  } catch (e) {
     console.warn("Analytics failed to initialize (likely environment restriction):", e);
+  }
+} else {
+  console.info("Native Analytics disabled to prevent crash");
 }
 
 console.log("🔥 Firebase Config Loaded for Project:", firebaseConfig.projectId);
