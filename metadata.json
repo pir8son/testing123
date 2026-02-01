@@ -1,0 +1,8 @@
+{
+  "name": "Swipe to Recipe AI Assistant",
+  "description": "An AI-powered kitchen helper that provides recipe suggestions, meal plans, and answers cooking questions. This app features a chat interface to interact with Gemini for a personalized cooking experience.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

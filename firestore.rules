@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper: Is the user logged in?
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    match /users/{userId} {
+      // --- LEGACY COLLECTIONS ---
+      // Allow authenticated users to access their legacy phone-number based profile data
+      allow read, write: if isAuthenticated();
+      
+      match /notifications/{notificationId} { allow read, write: if isAuthenticated(); }
+      match /pantry/{itemId} { allow read, write: if isAuthenticated(); }
+      match /shopping_list/{itemId} { allow read, write: if isAuthenticated(); }
+      match /saved_recipes/{recipeId} { allow read, write: if isAuthenticated(); }
+      match /drafts/{draftId} { allow read, write: if isAuthenticated(); }
+      match /followers/{followerId} { allow read, write: if isAuthenticated(); }
+      match /following/{followingId} { allow read, write: if isAuthenticated(); }
+
+      // --- NEW FEATURE: SAVED LISTS (Field-Based Security) ---
+      match /savedLists/{listId} {
+        // READ: Allow if Public OR if the 'ownerUid' field matches your Auth ID
+        allow read: if isAuthenticated() && (
+          resource.data.isPublic == true || 
+          resource.data.ownerUid == request.auth.uid
+        );
+        
+        // CREATE: Must stamp the document with your actual Auth UID
+        allow create: if isAuthenticated() && request.resource.data.ownerUid == request.auth.uid;
+        
+        // UPDATE/DELETE: Only the true owner (by Auth UID) can modify
+        allow update, delete: if isAuthenticated() && resource.data.ownerUid == request.auth.uid;
+      }
+    }
+
+    // --- PUBLIC CONTENT ---
+    match /recipes/{recipeId} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+      match /comments/{commentId} { allow read, write: if isAuthenticated(); }
+      match /likes/{likeId} { allow read, write: if isAuthenticated(); }
+    }
+    
+    match /usernames/{username} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+    }
+  }
+}
