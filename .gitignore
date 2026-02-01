@@ -3,3 +3,8 @@ node_modules/
 *.log
 dist/
 .expo/
+.env*
+*.keystore
+*.p12
+*.mobileprovision
+build/

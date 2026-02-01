@@ -7,5 +7,5 @@
       "@repo/shared/*": ["../../packages/shared/src/*"]
     }
   },
-  "include": ["src", "index.js"]
+  "include": ["src", "index.js", "app.config.ts"]
 }

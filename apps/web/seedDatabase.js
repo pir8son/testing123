@@ -2,15 +2,27 @@
 const { initializeApp } = require("firebase/app");
 const { getFirestore, doc, setDoc } = require("firebase/firestore");
 
-// 1. Raw Credentials for the Seeding Script
+// 1. Credentials for the seeding script (shared with Vite env vars)
 const firebaseConfig = {
-  apiKey: "AIzaSyCzBkYhBVL8KDT-CUyc6eqHFpz9AHIsI1k",
-  authDomain: "gen-lang-client-0320751781.firebaseapp.com",
-  projectId: "gen-lang-client-0320751781",
-  storageBucket: "gen-lang-client-0320751781.firebasestorage.app",
-  messagingSenderId: "284184285704",
-  appId: "1:284184285704:web:697ea4b8b5df66bdc477bd"
+  apiKey: process.env.VITE_FIREBASE_API_KEY ?? "",
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN ?? "",
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID ?? "",
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET ?? "",
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? "",
+  appId: process.env.VITE_FIREBASE_APP_ID ?? ""
 };
+
+const missingKeys = Object.entries(firebaseConfig)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
+
+if (missingKeys.length > 0) {
+  console.error(
+    `Missing Firebase config values: ${missingKeys.join(", ")}. ` +
+      "Set the VITE_FIREBASE_* environment variables before running the seed script."
+  );
+  process.exit(1);
+}
 
 // 2. Initialize Firebase
 const app = initializeApp(firebaseConfig);
