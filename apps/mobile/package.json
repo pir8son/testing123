@@ -7,7 +7,7 @@
     "start": "expo start",
     "ios": "expo run:ios",
     "android": "expo run:android",
-    "doctor": "expo doctor",
+    "doctor": "npx expo-doctor",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
