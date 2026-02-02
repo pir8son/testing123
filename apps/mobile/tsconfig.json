@@ -10,5 +10,5 @@
       "@repo/shared/*": ["../../packages/shared/src/*"]
     }
   },
-  "include": ["src", "index.js", "app.config.ts", "../../types/**/*.d.ts"]
+  "include": ["src", "index.js", "app.config.ts"]
 }

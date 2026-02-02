@@ -26,6 +26,8 @@ packages/
 
 ## Scripts (repo root)
 
+- Required: Node.js 18+ and npm workspaces enabled.
+- `npm run dom:lint` guards platform boundaries by blocking DOM globals in native/shared code.
 - `npm install`
 - `npm run web:dev`
 - `npm run mobile:start -- --clear`

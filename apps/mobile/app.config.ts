@@ -6,6 +6,11 @@ const publicEnvEntries = Object.entries(process.env).filter(
 
 const publicEnvConfig = Object.fromEntries(publicEnvEntries);
 
+const getPublicExtra = (extra: Record<string, unknown> | undefined) =>
+  Object.fromEntries(
+    Object.entries(extra ?? {}).filter(([key]) => key.startsWith('EXPO_PUBLIC_'))
+  );
+
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: process.env.EXPO_PUBLIC_APP_NAME ?? config.name ?? 'Mobile',
@@ -21,7 +26,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
       process.env.MOBILE_ANDROID_PACKAGE ?? config.android?.package ?? 'com.example.mobile'
   },
   extra: {
-    ...(config.extra ?? {}),
+    ...getPublicExtra(config.extra),
     ...publicEnvConfig
   }
 });

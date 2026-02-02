@@ -5,9 +5,13 @@
   "scripts": {
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
-  "dependencies": {
-    "react": "18.2.0",
-    "react-native": "0.73.6"
+  "peerDependencies": {
+    "react-native": ">=0.73.6"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
   },
   "main": "src/index.ts",
   "module": "src/index.ts",
