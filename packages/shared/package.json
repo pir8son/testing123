@@ -13,6 +13,9 @@
       "optional": true
     }
   },
+  "devDependencies": {
+    "react-native": "0.73.6"
+  },
   "main": "src/index.ts",
   "module": "src/index.ts",
   "types": "src/index.ts",
