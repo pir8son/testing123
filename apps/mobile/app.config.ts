@@ -11,22 +11,30 @@ const getPublicExtra = (extra: Record<string, unknown> | undefined) =>
     Object.entries(extra ?? {}).filter(([key]) => key.startsWith('EXPO_PUBLIC_'))
   );
 
-export default ({ config }: ConfigContext): ExpoConfig => ({
-  ...config,
-  name: process.env.EXPO_PUBLIC_APP_NAME ?? config.name ?? 'Mobile',
-  slug: process.env.EXPO_PUBLIC_APP_SLUG ?? config.slug ?? 'mobile',
-  ios: {
-    ...(config.ios ?? {}),
-    bundleIdentifier:
-      process.env.MOBILE_IOS_BUNDLE_ID ?? config.ios?.bundleIdentifier ?? 'com.example.mobile'
-  },
-  android: {
-    ...(config.android ?? {}),
-    package:
-      process.env.MOBILE_ANDROID_PACKAGE ?? config.android?.package ?? 'com.example.mobile'
-  },
-  extra: {
-    ...getPublicExtra(config.extra),
-    ...publicEnvConfig
-  }
-});
+export default (ctx: ConfigContext): ExpoConfig => {
+  const baseConfig = ctx.config;
+
+  return {
+    ...baseConfig,
+    name: process.env.EXPO_PUBLIC_APP_NAME ?? baseConfig.name ?? 'Mobile',
+    slug: process.env.EXPO_PUBLIC_APP_SLUG ?? baseConfig.slug ?? 'mobile',
+    ios: {
+      ...(baseConfig.ios ?? {}),
+      bundleIdentifier:
+        process.env.MOBILE_IOS_BUNDLE_ID ??
+        baseConfig.ios?.bundleIdentifier ??
+        'com.example.mobile'
+    },
+    android: {
+      ...(baseConfig.android ?? {}),
+      package:
+        process.env.MOBILE_ANDROID_PACKAGE ??
+        baseConfig.android?.package ??
+        'com.example.mobile'
+    },
+    extra: {
+      ...getPublicExtra(baseConfig.extra),
+      ...publicEnvConfig
+    }
+  };
+};

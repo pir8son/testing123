@@ -1,5 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { extname, join } from 'node:path';
+import { extname, join, relative } from 'node:path';
 
 const ROOT = process.cwd();
 const TARGET_DIRS = [join(ROOT, 'apps', 'mobile'), join(ROOT, 'packages', 'shared')];
@@ -13,14 +13,14 @@ const EXCLUDED_DIRS = new Set([
   '.expo',
   '.git',
   '.turbo',
-  '.next'
+  '.next',
+  '.cache',
+  '.vscode',
+  '.idea'
 ]);
 const WEB_FILE_PATTERN = /\.web\./;
-const DOM_PATTERNS = [
-  { label: 'window.document', pattern: /\bwindow\.document\b/ },
-  { label: 'globalThis.document', pattern: /\bglobalThis\.document\b/ },
-  { label: 'document', pattern: /\bdocument\b/ }
-];
+const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']);
+const DOM_REGEX = /\bwindow\.document\b|\bglobalThis\.document\b|\bdocument\b/g;
 
 function stripComments(line, inBlockComment) {
   let output = '';
@@ -77,7 +77,7 @@ async function walk(dir, violations) {
       }
 
       const ext = extname(entry.name);
-      if (!ext) {
+      if (!SOURCE_EXTENSIONS.has(ext)) {
         return;
       }
 
@@ -88,17 +88,18 @@ async function walk(dir, violations) {
         lines.forEach((line, index) => {
           const stripped = stripComments(line, inBlockComment);
           inBlockComment = stripped.inBlockComment;
-          DOM_PATTERNS.forEach(({ label, pattern }) => {
-            const match = stripped.text.match(pattern);
-            if (match) {
-              violations.push({
-                filePath: entryPath,
-                line: index + 1,
-                match: match[0],
-                label
-              });
-            }
-          });
+          DOM_REGEX.lastIndex = 0;
+          const matches = stripped.text.matchAll(DOM_REGEX);
+          for (const match of matches) {
+            const column = (match.index ?? 0) + 1;
+            violations.push({
+              filePath: entryPath,
+              line: index + 1,
+              column,
+              match: match[0],
+              snippet: line.trimEnd()
+            });
+          }
         });
       } catch (error) {
         console.warn(`Warning: unable to read ${entryPath}.`, error);
@@ -115,8 +116,9 @@ async function main() {
     console.error('DOM globals found in native/shared code. Move web-only logic to *.web.* files.');
     violations
       .sort((a, b) => a.filePath.localeCompare(b.filePath) || a.line - b.line)
-      .forEach(({ filePath, line, match, label }) => {
-        console.error(`- ${filePath}:${line} (${label}: ${match})`);
+      .forEach(({ filePath, line, column, match, snippet }) => {
+        const relativePath = relative(ROOT, filePath);
+        console.error(`${relativePath}:${line}:${column} ${match} | ${snippet}`);
       });
     process.exit(1);
   }
